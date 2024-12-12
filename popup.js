@@ -173,10 +173,12 @@ document.getElementById('san-marker-switch').addEventListener('change', function
 
 function toggleSanCardMarkers(enabled) {
   const sanCards = document.querySelectorAll('[tpl][new_srcid]');
+
   if (enabled) {
     sanCards.forEach(card => {
       const tpl = card.getAttribute('tpl');
       const newSrcid = card.getAttribute('new_srcid');
+
       if (!card.querySelector('.san-card-marker')) {
         // 创建标记容器
         const marker = document.createElement('div');
@@ -184,8 +186,25 @@ function toggleSanCardMarkers(enabled) {
 
         // 创建内容
         marker.innerHTML = `
-          <span class="san-card-tpl">tpl: ${tpl}</span>
-          <span class="san-card-new-srcid">new_srcid: ${newSrcid}</span>
+          <div style="flex: 1; display: flex; align-items: center; gap: 26px;">
+            <span class="san-card-tpl" style="cursor: pointer; color: #4fc3f7; font-size: 14px; font-weight: 600;">名称: ${tpl}</span>
+            <span class="san-card-new-srcid" style="cursor: pointer; color: #4fc3f7; font-size: 14px; font-weight: 600;">ID: ${newSrcid}</span>
+          </div>
+          <div class="san-card-vscode" title="打开文件" style="
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            background-color: #4fc3f7;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+          ">V</div>
         `;
 
         // 设置卡片根节点的定位
@@ -194,29 +213,137 @@ function toggleSanCardMarkers(enabled) {
         // 添加标记样式
         marker.style.cssText = `
           position: absolute;
-          top: -28px;
+          top: -4px;
           left: 8px;
           right: 8px;
-          padding: 4px 12px;
-          font-size: 12px;
-          font-weight: bold;
+          padding: 1px 12px;
+          font-size: 10px;
           color: white;
-          background-color: rgba(0, 0, 0, 0.85);
-          border-radius: 6px;
+          background-color: rgba(0, 0, 0, 0.7); /* 深灰半透明背景 */
+          border-radius: 8px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           z-index: 100;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         `;
 
         // 添加到卡片
         card.appendChild(marker);
+
+        // 点击 tpl 名称，复制内容
+        marker.querySelector('.san-card-tpl').addEventListener('click', () => {
+          copyToClipboard(tpl);
+          showFeedback('卡片名称已复制！', 'success');
+        });
+
+        // 点击 new_srcid，复制内容
+        marker.querySelector('.san-card-new-srcid').addEventListener('click', () => {
+          copyToClipboard(newSrcid);
+          showFeedback('卡片 ID 已复制！', 'success');
+        });
+
+        // 点击 "V" 打开文件
+        marker.querySelector('.san-card-vscode').addEventListener('click', () => {
+          // 显示“正在打开文件...”提示
+          const loadingMessage = showFeedback('正在打开文件...', 'loading');
+
+          chrome.runtime.sendMessage(
+            { type: 'openFile', srcid: tpl },
+            (response) => {
+              if (chrome.runtime.lastError || !response.success) {
+                console.error('Message Error:', chrome.runtime.lastError?.message || response.error);
+                updateFeedback(loadingMessage, '文件打开失败，请检查配置。', 'error');
+              } else {
+                updateFeedback(loadingMessage, '文件已成功打开！', 'success');
+                console.log('Response from background:', response);
+              }
+            }
+          );
+        });
       }
     });
   } else {
     document.querySelectorAll('.san-card-marker').forEach(marker => marker.remove());
   }
+
+  // 复制到剪贴板
+  function copyToClipboard(text) {
+    const tempInput = document.createElement('input');
+    document.body.appendChild(tempInput);
+    tempInput.value = text;
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+  }
+
+  // 显示提示框
+  function showFeedback(message, type) {
+    const feedbackBox = document.createElement('div');
+    feedbackBox.textContent = message;
+
+    const colors = {
+      success: 'rgba(76, 175, 80, 0.9)', // 成功绿色
+      error: 'rgba(239, 83, 80, 0.9)', // 错误红色
+      loading: 'rgba(33, 150, 243, 0.9)' // 加载蓝色
+    };
+
+    feedbackBox.style.cssText = `
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: ${colors[type]};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      animation: fadeInOut 3s ease-in-out;
+    `;
+
+    document.body.appendChild(feedbackBox);
+
+    // 动态添加动画样式
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    setTimeout(() => feedbackBox.remove(), 3000);
+    return feedbackBox;
+  }
+
+  // 更新提示框内容
+  function updateFeedback(element, message, type) {
+    const colors = {
+      success: 'rgba(76, 175, 80, 0.9)', // 成功绿色
+      error: 'rgba(239, 83, 80, 0.9)' // 错误红色
+    };
+
+    element.textContent = message;
+    element.style.backgroundColor = colors[type];
+    setTimeout(() => element.remove(), 3000);
+  }
 }
 
 
+
+// {
+//   "name": "san_file_opener",
+//   "description": "Search and open .san files in VSCode",
+//   "path": "/Users/baozhangjie/Desktop/cb-wise-debugger/native-messaging/openFile.js",
+//   "type": "stdio",
+//   "allowed_origins": [
+//     "chrome-extension://ecpnogghddpojgaoefebgbkmohikgnim/"
+//   ]
+// }
