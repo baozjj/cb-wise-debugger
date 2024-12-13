@@ -192,7 +192,7 @@ function toggleSanCardMarkers(enabled) {
           </div>
           <div class="san-card-vscode" title="打开文件" style="
             cursor: pointer;
-            width: 16px;
+            width: 46px;
             height: 16px;
             background-color: #4fc3f7;
             color: white;
@@ -201,10 +201,10 @@ function toggleSanCardMarkers(enabled) {
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 50%;
+            border-radius: 3px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s ease, transform 0.3s ease;
-          ">V</div>
+          ">VSCode</div>
         `;
 
         // 设置卡片根节点的定位
