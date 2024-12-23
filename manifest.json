@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "wise 调试",
-  "version": "1.0",
+  "version": "1.1",
   "author": ["baozj", "chenshuo"],
   "description": "可以进行字体以及暗黑模式的调试，并扩展 San 卡标记功能。",
   "permissions": [

@@ -1,171 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Font and Theme Settings</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f5f5f7;
-      color: #1c1c1e;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Font and Theme Settings</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f5f5f7;
+        color: #1c1c1e;
+      }
 
-    .container {
-      width: 320px;
-      padding: 24px;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
+      .container {
+        width: 320px;
+        padding: 24px;
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
 
-    .section {
-      margin-bottom: 24px;
-    }
+      .section {
+        margin-bottom: 24px;
+      }
 
-    .section h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
+      .section h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
 
-    .font-size-options {
-      display: flex;
-      justify-content: space-between;
-    }
+      .font-size-options {
+        display: flex;
+        justify-content: space-between;
+      }
 
-    .font-size-option {
-      flex: 1;
-      margin: 0 5px;
-      padding: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      color: #007aff;
-      background-color: #f0f0f5;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
+      .font-size-option {
+        flex: 1;
+        margin: 0 5px;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        color: #007aff;
+        background-color: #f0f0f5;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
 
-    .font-size-option:hover {
-      background-color: #e5e5ea;
-    }
+      .font-size-option:hover {
+        background-color: #e5e5ea;
+      }
 
-    .font-size-option.selected {
-      background-color: #007aff;
-      color: white;
-    }
+      .font-size-option.selected {
+        background-color: #007aff;
+        color: white;
+      }
 
-    /* 深色模式与 San 卡标记开关的样式 */
-    .toggle-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      background-color: #f0f0f5;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
+      /* 深色模式与 San 卡标记开关的样式 */
+      .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background-color: #f0f0f5;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
 
-    .toggle-wrapper:hover {
-      background-color: #e5e5ea;
-    }
+      .toggle-wrapper:hover {
+        background-color: #e5e5ea;
+      }
 
-    .toggle-wrapper span {
-      font-size: 14px;
-      font-weight: 500;
-    }
+      .toggle-wrapper span {
+        font-size: 14px;
+        font-weight: 500;
+      }
 
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+      }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
 
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ddd;
-      transition: all 0.4s;
-      border-radius: 14px;
-    }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ddd;
+        transition: all 0.4s;
+        border-radius: 14px;
+      }
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 22px;
-      width: 22px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: all 0.4s;
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: all 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
 
-    input:checked + .slider {
-      background-color: #34c759;
-    }
+      input:checked + .slider {
+        background-color: #34c759;
+      }
 
-    input:checked + .slider:before {
-      transform: translateX(22px);
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="section">
-      <h3>字体大小</h3>
-      <div class="font-size-options">
-        <div class="font-size-option" data-size="small">小</div>
-        <div class="font-size-option selected" data-size="medium">标准</div>
-        <div class="font-size-option" data-size="large">大</div>
-        <div class="font-size-option" data-size="x-large">超大</div>
+      input:checked + .slider:before {
+        transform: translateX(22px);
+      }
+
+      .search-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .search-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-right: 8px;
+      }
+
+      .search-btn {
+        padding: 10px 15px;
+        border: none;
+        background-color: #007aff;
+        color: white;
+        font-size: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .search-btn:hover {
+        background-color: #005bb5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="section">
+        <h3>字体大小</h3>
+        <div class="font-size-options">
+          <div class="font-size-option" data-size="small">小</div>
+          <div class="font-size-option selected" data-size="medium">标准</div>
+          <div class="font-size-option" data-size="large">大</div>
+          <div class="font-size-option" data-size="x-large">超大</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>主题设置</h3>
+        <div class="toggle-wrapper">
+          <span>深色模式</span>
+          <label class="switch">
+            <input type="checkbox" id="theme-switch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-wrapper" style="margin-top: 10px">
+          <span>TTS 模式</span>
+          <label class="switch">
+            <input type="checkbox" id="tts-switch">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Aladdin 卡标记</h3>
+        <div class="toggle-wrapper">
+          <span>开启标记</span>
+          <label class="switch">
+            <input type="checkbox" id="san-marker-switch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>query 关键字查询</h3>
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="san-card-name"
+            placeholder="请输入 Aladdin 卡名称或 scrid"
+            class="search-input"
+          />
+          <button id="search-btn" class="search-btn">搜索</button>
+        </div>
       </div>
     </div>
-
-    <div class="section">
-      <h3>主题设置</h3>
-      <div class="toggle-wrapper">
-        <span>深色模式</span>
-        <label class="switch">
-          <input type="checkbox" id="theme-switch">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="section">
-      <h3>Aladdin 卡标记</h3>
-      <div class="toggle-wrapper">
-        <span>开启标记</span>
-        <label class="switch">
-          <input type="checkbox" id="san-marker-switch">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-  </div>
-  <script src="popup.js"></script>
-</body>
+    <script src="popup.js"></script>
+  </body>
 </html>

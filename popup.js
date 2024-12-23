@@ -1,54 +1,73 @@
 // 初始化插件状态
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
   // 从 chrome.storage.local 中读取状态
-  chrome.storage.local.get(['fontSize', 'darkModeEnabled', 'sanMarkerEnabled'], function (data) {
-    // 字体大小状态同步
-    const selectedSize = data.fontSize || 'medium';
-    document.querySelectorAll('.font-size-option').forEach(option => {
-      option.classList.toggle('selected', option.getAttribute('data-size') === selectedSize);
-    });
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        function: changeFontSize,
-        args: [selectedSize]
+  chrome.storage.local.get(
+    ["fontSize", "darkModeEnabled", "sanMarkerEnabled"],
+    function (data) {
+      // 字体大小状态同步
+      const selectedSize = data.fontSize || "medium";
+      document.querySelectorAll(".font-size-option").forEach((option) => {
+        option.classList.toggle(
+          "selected",
+          option.getAttribute("data-size") === selectedSize
+        );
       });
-    });
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          function: changeFontSize,
+          args: [selectedSize],
+        });
+      });
 
-    // 深色模式状态同步
-    const isDarkMode = data.darkModeEnabled || false;
-    document.getElementById('theme-switch').checked = isDarkMode;
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        function: toggleDarkMode,
-        args: [isDarkMode]
+      // 深色模式状态同步
+      const isDarkMode = data.darkModeEnabled || false;
+      document.getElementById("theme-switch").checked = isDarkMode;
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          function: toggleDarkMode,
+          args: [isDarkMode],
+        });
       });
-    });
 
-    // San 卡标记状态同步
-    const isMarkerOn = data.sanMarkerEnabled || false;
-    document.getElementById('san-marker-switch').checked = isMarkerOn;
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        function: toggleSanCardMarkers,
-        args: [isMarkerOn]
+      // TTS模式状态同步
+      const isTtsMode = data.ttsModeEnabled || false;
+      document.getElementById("tts-switch").checked = isTtsMode;
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          function: toggleTtsMode,
+          args: [isTtsMode],
+        });
       });
-    });
-  });
+
+      // San 卡标记状态同步
+      const isMarkerOn = data.sanMarkerEnabled || false;
+      document.getElementById("san-marker-switch").checked = isMarkerOn;
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          function: toggleSanCardMarkers,
+          args: [isMarkerOn],
+        });
+      });
+    }
+  );
 });
 
 // 字体大小切换功能
-document.querySelectorAll('.font-size-option').forEach(option => {
-  option.addEventListener('click', function () {
+document.querySelectorAll(".font-size-option").forEach((option) => {
+  option.addEventListener("click", function () {
     // 移除所有选中的样式
-    document.querySelectorAll('.font-size-option').forEach(opt => opt.classList.remove('selected'));
+    document
+      .querySelectorAll(".font-size-option")
+      .forEach((opt) => opt.classList.remove("selected"));
 
     // 添加选中的样式
-    this.classList.add('selected');
+    this.classList.add("selected");
 
-    const selectedSize = this.getAttribute('data-size');
+    const selectedSize = this.getAttribute("data-size");
 
     // 保存状态到 storage
     chrome.storage.local.set({ fontSize: selectedSize });
@@ -58,7 +77,7 @@ document.querySelectorAll('.font-size-option').forEach(option => {
       chrome.scripting.executeScript({
         target: { tabId: tabs[0].id },
         function: changeFontSize,
-        args: [selectedSize]
+        args: [selectedSize],
       });
     });
   });
@@ -70,17 +89,17 @@ function changeFontSize(size) {
   const bodyElement = document.body;
 
   const sizeMap = {
-    'small': '86px',
-    'medium': '100px',
-    'large': '106px',
-    'x-large': '134px'
+    small: "86px",
+    medium: "100px",
+    large: "106px",
+    "x-large": "134px",
   };
 
   const sizeClassMap = {
-    'small': 'font-size-0',
-    'medium': 'font-size-1',
-    'large': 'font-size-2',
-    'x-large': 'font-size-3'
+    small: "font-size-0",
+    medium: "font-size-1",
+    large: "font-size-2",
+    "x-large": "font-size-3",
   };
 
   const setFontSize = (size) => {
@@ -102,14 +121,14 @@ function changeFontSize(size) {
         for (const rule of rules) {
           if (rule.style) {
             // 检查 font-size
-            if (rule.style.fontSize && rule.style.fontSize.includes('px')) {
+            if (rule.style.fontSize && rule.style.fontSize.includes("px")) {
               const fontSizeInPx = parseFloat(rule.style.fontSize);
               const fontSizeInRem = fontSizeInPx / 100;
               rule.style.fontSize = `${fontSizeInRem}rem`; // 转换为 rem
             }
 
             // 检查 line-height
-            if (rule.style.lineHeight && rule.style.lineHeight.includes('px')) {
+            if (rule.style.lineHeight && rule.style.lineHeight.includes("px")) {
               const lineHeightInPx = parseFloat(rule.style.lineHeight);
               const lineHeightInRem = lineHeightInPx / 100;
               rule.style.lineHeight = `${lineHeightInRem}rem`; // 转换为 rem
@@ -117,7 +136,7 @@ function changeFontSize(size) {
           }
         }
       } catch (e) {
-        console.warn('无法访问样式表规则:', sheet.href, e);
+        console.warn("无法访问样式表规则:", sheet.href, e);
       }
     }
   };
@@ -130,7 +149,7 @@ function changeFontSize(size) {
 }
 
 // 深色模式切换功能
-document.getElementById('theme-switch').addEventListener('change', function () {
+document.getElementById("theme-switch").addEventListener("change", function () {
   const isDarkMode = this.checked;
 
   // 保存状态到 storage
@@ -141,54 +160,81 @@ document.getElementById('theme-switch').addEventListener('change', function () {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
       function: toggleDarkMode,
-      args: [isDarkMode]
+      args: [isDarkMode],
     });
   });
 });
 
 function toggleDarkMode(isDarkMode) {
   if (isDarkMode) {
-    document.body.classList.add('c-darkmode', 'darkmode', 'cos-dark');
+    document.body.classList.add("c-darkmode", "darkmode", "cos-dark");
   } else {
-    document.body.classList.remove('c-darkmode', 'darkmode', 'cos-dark');
+    document.body.classList.remove("c-darkmode", "darkmode", "cos-dark");
   }
 }
 
-// San 卡标记功能
-document.getElementById('san-marker-switch').addEventListener('change', function () {
-  const isMarkerOn = this.checked;
+// TTS模式切换功能
+document.getElementById("tts-switch").addEventListener("change", function () {
+  const isTtsMode = this.checked;
 
   // 保存状态到 storage
-  chrome.storage.local.set({ sanMarkerEnabled: isMarkerOn });
+  chrome.storage.local.set({ ttsModeEnabled: isTtsMode });
 
   // 同步到页面
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
-      function: toggleSanCardMarkers,
-      args: [isMarkerOn]
+      function: toggleTtsMode,
+      args: [isTtsMode],
     });
   });
 });
 
+function toggleTtsMode(isTtsMode) {
+  if (isTtsMode) {
+    document.body.classList.add("cos-ttsmode");
+  } else {
+    document.body.classList.remove("cos-ttsmode");
+  }
+}
+
+// San 卡标记功能
+document
+  .getElementById("san-marker-switch")
+  .addEventListener("change", function () {
+    const isMarkerOn = this.checked;
+
+    // 保存状态到 storage
+    chrome.storage.local.set({ sanMarkerEnabled: isMarkerOn });
+
+    // 同步到页面
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        function: toggleSanCardMarkers,
+        args: [isMarkerOn],
+      });
+    });
+  });
+
 function toggleSanCardMarkers(enabled) {
-  const sanCards = document.querySelectorAll('[tpl][new_srcid]');
+  const sanCards = document.querySelectorAll("[tpl][new_srcid]");
 
   if (enabled) {
-    sanCards.forEach(card => {
-      const tpl = card.getAttribute('tpl');
-      const newSrcid = card.getAttribute('new_srcid');
+    sanCards.forEach((card) => {
+      const tpl = card.getAttribute("tpl");
+      const newSrcid = card.getAttribute("new_srcid");
 
-      if (!card.querySelector('.san-card-marker')) {
+      if (!card.querySelector(".san-card-marker")) {
         // 创建标记容器
-        const marker = document.createElement('div');
-        marker.className = 'san-card-marker';
+        const marker = document.createElement("div");
+        marker.className = "san-card-marker";
 
         // 创建内容
         marker.innerHTML = `
           <div style="flex: 1; display: flex; align-items: center; gap: 26px;">
             <span class="san-card-tpl" style="cursor: pointer; color: #4fc3f7; font-size: 14px; font-weight: 600;">名称: ${tpl}</span>
-            <span class="san-card-new-srcid" style="cursor: pointer; color: #4fc3f7; font-size: 14px; font-weight: 600;">ID: ${newSrcid}</span>
+            <span class="san-card-new-srcid" style="cursor: pointer; color: #4fc3f7; font-size: 14px; font-weight: 600;">srcid: ${newSrcid}</span>
           </div>
           <div class="san-card-vscode" title="打开文件" style="
             cursor: pointer;
@@ -208,7 +254,7 @@ function toggleSanCardMarkers(enabled) {
         `;
 
         // 设置卡片根节点的定位
-        card.style.position = 'relative';
+        card.style.position = "relative";
 
         // 添加标记样式
         marker.style.cssText = `
@@ -232,60 +278,73 @@ function toggleSanCardMarkers(enabled) {
         card.appendChild(marker);
 
         // 点击 tpl 名称，复制内容
-        marker.querySelector('.san-card-tpl').addEventListener('click', () => {
+        marker.querySelector(".san-card-tpl").addEventListener("click", () => {
           copyToClipboard(tpl);
-          showFeedback('卡片名称已复制！', 'success');
+          showFeedback("卡片名称已复制！", "success");
         });
 
         // 点击 new_srcid，复制内容
-        marker.querySelector('.san-card-new-srcid').addEventListener('click', () => {
-          copyToClipboard(newSrcid);
-          showFeedback('卡片 ID 已复制！', 'success');
-        });
+        marker
+          .querySelector(".san-card-new-srcid")
+          .addEventListener("click", () => {
+            copyToClipboard(newSrcid);
+            showFeedback("卡片 ID 已复制！", "success");
+          });
 
         // 点击 "V" 打开文件
-        marker.querySelector('.san-card-vscode').addEventListener('click', () => {
-          // 显示“正在打开文件...”提示
-          const loadingMessage = showFeedback('正在打开文件...', 'loading');
+        marker
+          .querySelector(".san-card-vscode")
+          .addEventListener("click", () => {
+            // 显示“正在打开文件...”提示
+            const loadingMessage = showFeedback("正在打开文件...", "loading");
 
-          chrome.runtime.sendMessage(
-            { type: 'openFile', srcid: tpl },
-            (response) => {
-              if (chrome.runtime.lastError || !response.success) {
-                console.error('Message Error:', chrome.runtime.lastError?.message || response.error);
-                updateFeedback(loadingMessage, '文件打开失败，请检查配置。', 'error');
-              } else {
-                updateFeedback(loadingMessage, '文件已成功打开！', 'success');
-                console.log('Response from background:', response);
+            chrome.runtime.sendMessage(
+              { type: "openFile", srcid: tpl },
+              (response) => {
+                if (chrome.runtime.lastError || !response.success) {
+                  console.error(
+                    "Message Error:",
+                    chrome.runtime.lastError?.message || response.error
+                  );
+                  updateFeedback(
+                    loadingMessage,
+                    "文件打开失败，请检查配置。",
+                    "error"
+                  );
+                } else {
+                  updateFeedback(loadingMessage, "文件已成功打开！", "success");
+                  console.log("Response from background:", response);
+                }
               }
-            }
-          );
-        });
+            );
+          });
       }
     });
   } else {
-    document.querySelectorAll('.san-card-marker').forEach(marker => marker.remove());
+    document
+      .querySelectorAll(".san-card-marker")
+      .forEach((marker) => marker.remove());
   }
 
   // 复制到剪贴板
   function copyToClipboard(text) {
-    const tempInput = document.createElement('input');
+    const tempInput = document.createElement("input");
     document.body.appendChild(tempInput);
     tempInput.value = text;
     tempInput.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(tempInput);
   }
 
   // 显示提示框
   function showFeedback(message, type) {
-    const feedbackBox = document.createElement('div');
+    const feedbackBox = document.createElement("div");
     feedbackBox.textContent = message;
 
     const colors = {
-      success: 'rgba(76, 175, 80, 0.9)', // 成功绿色
-      error: 'rgba(239, 83, 80, 0.9)', // 错误红色
-      loading: 'rgba(33, 150, 243, 0.9)' // 加载蓝色
+      success: "rgba(76, 175, 80, 0.9)", // 成功绿色
+      error: "rgba(239, 83, 80, 0.9)", // 错误红色
+      loading: "rgba(33, 150, 243, 0.9)", // 加载蓝色
     };
 
     feedbackBox.style.cssText = `
@@ -308,7 +367,7 @@ function toggleSanCardMarkers(enabled) {
     document.body.appendChild(feedbackBox);
 
     // 动态添加动画样式
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       @keyframes fadeInOut {
         0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
@@ -326,8 +385,8 @@ function toggleSanCardMarkers(enabled) {
   // 更新提示框内容
   function updateFeedback(element, message, type) {
     const colors = {
-      success: 'rgba(76, 175, 80, 0.9)', // 成功绿色
-      error: 'rgba(239, 83, 80, 0.9)' // 错误红色
+      success: "rgba(76, 175, 80, 0.9)", // 成功绿色
+      error: "rgba(239, 83, 80, 0.9)", // 错误红色
     };
 
     element.textContent = message;
@@ -335,15 +394,32 @@ function toggleSanCardMarkers(enabled) {
     setTimeout(() => element.remove(), 3000);
   }
 }
+// Aladdin
+// 监听搜索按钮点击事件
+document.getElementById("search-btn").addEventListener("click", function () {
+  // 获取用户输入的内容
+  const inputValue = document.getElementById("san-card-name").value.trim();
 
+  // 如果输入为空，提示用户输入内容
+  if (!inputValue) {
+    alert("请输入 Aladdin 卡名称或 scrid");
+    return;
+  }
 
+  // 判断输入的是san卡名称还是scrid
+  let url = "";
+  if (isNaN(inputValue)) {
+    // 输入的是San卡名称，拼接template参数
+    url = `https://pt.baidu-int.com/api/digger/topquery?template=${encodeURIComponent(
+      inputValue
+    )}`;
+  } else {
+    // 输入的是scrid，拼接scrid参数
+    url = `https://pt.baidu-int.com/api/digger/topquery?scrid=${encodeURIComponent(
+      inputValue
+    )}`;
+  }
 
-// {
-//   "name": "san_file_opener",
-//   "description": "Search and open .san files in VSCode",
-//   "path": "/Users/baozhangjie/Desktop/cb-wise-debugger/native-messaging/openFile.js",
-//   "type": "stdio",
-//   "allowed_origins": [
-//     "chrome-extension://ecpnogghddpojgaoefebgbkmohikgnim/"
-//   ]
-// }
+  // 打开新页面
+  window.open(url, "_blank");
+});
