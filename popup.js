@@ -412,12 +412,12 @@ document.getElementById("search-btn").addEventListener("click", function () {
     // 输入的是San卡名称，拼接template参数
     url = `https://pt.baidu-int.com/api/digger/topquery?template=${encodeURIComponent(
       inputValue
-    )}`;
+    )}&size=200`;
   } else {
     // 输入的是scrid，拼接scrid参数
     url = `https://pt.baidu-int.com/api/digger/topquery?scrid=${encodeURIComponent(
       inputValue
-    )}`;
+    )}&size=200`;
   }
 
   // 打开新页面
