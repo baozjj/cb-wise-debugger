@@ -1,3 +1,25 @@
+
+function log(message) {
+  fetch("https://api.ipify.org?format=json")
+  .then((response) => response.json())
+  .then((data) => {
+    const userIP = data.ip || "null"; // 获取到的 IP 地址
+    message += ` - (IP: ${userIP})`;
+
+    fetch(`http://baozj.top/api/log?message=${encodeURIComponent(message)}`)
+      .then((response) => response.text())
+      .then((data) => {
+        console.log("Log recorded:", data);
+      })
+      .catch((error) => {
+        console.error("Error recording log:", error);
+      });
+  })
+  .catch(() => {
+    console.error("Error fetching IP address.");
+  });
+}
+
 // 初始化插件状态
 document.addEventListener("DOMContentLoaded", function () {
   // 从 chrome.storage.local 中读取状态
@@ -68,6 +90,9 @@ document.querySelectorAll(".font-size-option").forEach((option) => {
     this.classList.add("selected");
 
     const selectedSize = this.getAttribute("data-size");
+
+    let message = `Font size changed to: ${selectedSize}`;
+    log(message);
 
     // 保存状态到 storage
     chrome.storage.local.set({ fontSize: selectedSize });
@@ -155,6 +180,9 @@ document.getElementById("theme-switch").addEventListener("change", function () {
   // 保存状态到 storage
   chrome.storage.local.set({ darkModeEnabled: isDarkMode });
 
+  let message = `DarkMode isDarkMode: ${isDarkMode}`;
+  log(message)
+
   // 同步到页面
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.scripting.executeScript({
@@ -176,6 +204,9 @@ function toggleDarkMode(isDarkMode) {
 // TTS模式切换功能
 document.getElementById("tts-switch").addEventListener("change", function () {
   const isTtsMode = this.checked;
+
+  let message = `TTS Mode isTtsMode: ${isTtsMode}`;
+  log(message)
 
   // 保存状态到 storage
   chrome.storage.local.set({ ttsModeEnabled: isTtsMode });
@@ -203,6 +234,8 @@ document
   .getElementById("san-marker-switch")
   .addEventListener("change", function () {
     const isMarkerOn = this.checked;
+    let message = `San Marker isMarkerOn: ${isMarkerOn}`;
+    log(message)
 
     // 保存状态到 storage
     chrome.storage.local.set({ sanMarkerEnabled: isMarkerOn });
@@ -280,6 +313,28 @@ function toggleSanCardMarkers(enabled) {
         // 点击 tpl 名称，复制内容
         marker.querySelector(".san-card-tpl").addEventListener("click", () => {
           copyToClipboard(tpl);
+          let message = `copyTql: ${tpl}`;
+          // log(message);
+
+
+          fetch("https://api.ipify.org?format=json")
+          .then((response) => response.json())
+          .then((data) => {
+            const userIP = data.ip || "null"; // 获取到的 IP 地址
+            message += ` - (IP: ${userIP})`;
+        
+            fetch(`http://baozj.top/api/log?message=${encodeURIComponent(message)}`)
+              .then((response) => response.text())
+              .then((data) => {
+                console.log("Log recorded:", data);
+              })
+              .catch((error) => {
+                console.error("Error recording log:", error);
+              });
+          })
+          .catch(() => {
+            console.error("Error fetching IP address.");
+          });
           showFeedback("卡片名称已复制！", "success");
         });
 
@@ -288,6 +343,27 @@ function toggleSanCardMarkers(enabled) {
           .querySelector(".san-card-new-srcid")
           .addEventListener("click", () => {
             copyToClipboard(newSrcid);
+            let message = `copyScrid: ${newSrcid}`;
+            // log(`copyScrid: ${newSrcid}`);
+
+            fetch("https://api.ipify.org?format=json")
+            .then((response) => response.json())
+            .then((data) => {
+              const userIP = data.ip || "null"; // 获取到的 IP 地址
+              message += ` - (IP: ${userIP})`;
+          
+              fetch(`http://baozj.top/api/log?message=${encodeURIComponent(message)}`)
+                .then((response) => response.text())
+                .then((data) => {
+                  console.log("Log recorded:", data);
+                })
+                .catch((error) => {
+                  console.error("Error recording log:", error);
+                });
+            })
+            .catch(() => {
+              console.error("Error fetching IP address.");
+            });
             showFeedback("卡片 ID 已复制！", "success");
           });
 
@@ -297,6 +373,29 @@ function toggleSanCardMarkers(enabled) {
           .addEventListener("click", () => {
             // 显示“正在打开文件...”提示
             const loadingMessage = showFeedback("正在打开文件...", "loading");
+
+            let message = `openFile: tpl=${tpl}, newSrcid: ${newSrcid}`;
+            // log(message);
+
+
+            fetch("https://api.ipify.org?format=json")
+            .then((response) => response.json())
+            .then((data) => {
+              const userIP = data.ip || "null"; // 获取到的 IP 地址
+              message += ` - (IP: ${userIP})`;
+          
+              fetch(`http://baozj.top/api/log?message=${encodeURIComponent(message)}`)
+                .then((response) => response.text())
+                .then((data) => {
+                  console.log("Log recorded:", data);
+                })
+                .catch((error) => {
+                  console.error("Error recording log:", error);
+                });
+            })
+            .catch(() => {
+              console.error("Error fetching IP address.");
+            });
 
             chrome.runtime.sendMessage(
               { type: "openFile", srcid: tpl },
