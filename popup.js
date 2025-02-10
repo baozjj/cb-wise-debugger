@@ -423,3 +423,87 @@ document.getElementById("search-btn").addEventListener("click", function () {
   // 打开新页面
   window.open(url, "_blank");
 });
+
+
+// 新增的脚本逻辑
+document.getElementById('parse-btn').addEventListener('click', () => {
+  try {
+    const input = document.getElementById('json-input').value;
+    const parsed = outputGenericBugSummary(JSON.parse(input));
+    document.getElementById('parsed-content').textContent = parsed;
+    document.getElementById('json-modal').style.display = 'flex';
+  } catch (e) {
+    alert('JSON解析错误: ' + e.message);
+  }
+});
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('json-modal').style.display = 'none';
+});
+
+document.getElementById('json-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.style.display = 'none';
+  }
+});
+
+
+
+function outputGenericBugSummary(data) {
+  
+  if (!data || !data._source) {
+      return "错误：数据格式无效"
+  }
+
+  const s = data._source;
+
+  // 解析时间戳为本地时间字符串
+  const timestamp = typeof s["@timestamp"] === "number"
+    ? new Date(s["@timestamp"]).toLocaleString()
+    : s["@timestamp"] || "未知";
+
+  // 获取并解码页面 URL（若包含中文参数）
+  const rawUrl = (s.info && s.info.pageUrl) || s.pageurl || "未知";
+  let decodedUrl;
+  try {
+    decodedUrl = decodeURIComponent(rawUrl);
+  } catch (e) {
+    decodedUrl = rawUrl;
+  }
+
+  // 提取错误信息和堆栈
+  const errorMsg = (s.info && s.info.msg) || "无错误信息";
+  const errorStack = (s.info && s.info.stack) || "无堆栈信息";
+
+  // 提取 Hook 字段，并给出通用说明：
+  // 该字段通常标识错误发生时的代码触发点，
+  // 如计算属性、生命周期钩子、或其它事件回调函数等，
+  // 具体内容取决于实际业务代码。
+  const hook = (s.info && s.info.hook) || "未提供";
+  const hookExplanation = `：${hook}`;
+
+  // 组装输出摘要
+  const summary = `
+【日志信息】
+  - 日志ID: ${s.lid || "N/A"}
+  - 进程/版本: ${s.pid || "N/A"}
+  - 发生时间: ${timestamp}
+  - 客户端 IP: ${s.ip || "未知"}
+
+【复现环境】
+  - 页面 URL: ${decodedUrl}
+  - 操作系统: ${s.os || "未知"}
+  - 浏览器类型: ${s.browser || "未知"}
+  - User Agent: ${s.useragent || "未知"}
+  - 环境标识: ${(s.info && s.info.env) || (s.dim && s.dim.env) || "未知"}
+
+【错误详情】
+  - 错误信息: ${errorMsg}
+  - 错误触发入口函数: ${hookExplanation}
+  - 错误堆栈: ${errorStack}
+`;
+
+  console.log(summary);
+  return summary;
+}
+
